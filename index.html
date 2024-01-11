@@ -1,68 +1,85 @@
 <meta charset="utf-8">
 <link rel="stylesheet" href="./styles.css">
 
-<div></div>
+<section>
+    <div></div>
+    <button id="up">👆🏻</button>
+    <button id="down">👇🏻</button>
+</section>
 
 <script>
 
-    const createCalendar = ({ locale, year })=>{
-        
-    const weekdays = [...Array(7).keys()];
-    const intlWeekDay = new Intl.DateTimeFormat(locale,{ weekday: "long" });
+    const createCalendar = ({ locale, year }) => {
 
-    const weekDaysNames = weekdays.map(weekDayIndex => {
-        const weekDayName = intlWeekDay.format(new Date(2021, 10, weekDayIndex + 1));
-        return weekDayName;
-    });
+        const weekdays = [...Array(7).keys()];
+        const intlWeekDay = new Intl.DateTimeFormat(locale, { weekday: "short" });
 
-    const renderedWeekDays = weekDaysNames.map
-    (weekDayName =>`<li class="day-name">${weekDayName}</li>`).join("");
+        const el = document.querySelector("div");
+        // const {innerHeight: windowHeight} = window.innerHeight;
 
-    const months = [...Array(12).keys()];
-    const intl = new Intl.DateTimeFormat(locale, { month: "long"});
-    const calendar = months.map(monthKey => {
-        const monthName = intl.format(new Date(year, monthKey));
+        document.getElementById("up").addEventListener("click", () => {
+            el.scrollTo({ top: el.scrollTop - window.innerHeight, behavior: "smooth" });
+        });
 
-        const nextMonthIndex = monthKey + 1;
+        document.getElementById("down").addEventListener("click", () => {
+            el.scrollTo({ top: el.scrollTop + window.innerHeight, behavior: "smooth" });
+        });
 
-        const daysOfMonth = new Date(year, nextMonthIndex, 0).getDate();
+        const weekDaysNames = weekdays.map(weekDayIndex => {
+            const weekDayName = intlWeekDay.format(new Date(2021, 10, weekDayIndex + 1));
+            return weekDayName;
+        });
 
-        const startsOn = new Date(year, monthKey, 1).getDay();
+        const renderedWeekDays = weekDaysNames.map
+            (weekDayName => `<li class="day-name">${weekDayName}</li>`).join("");
 
-        return {
-            monthName,
-            daysOfMonth,
-            startsOn
-        };
-    });
+        const months = [...Array(12).keys()];
+        const intl = new Intl.DateTimeFormat(locale, { month: "long" });
+        const calendar = months.map(monthKey => {
+            const monthName = intl.format(new Date(year, monthKey));
 
-    console.log(calendar)
+            const nextMonthIndex = monthKey + 1;
 
-    const html = calendar.map(({ daysOfMonth, monthName, startsOn })=>{
-        
-        const days = [...Array(daysOfMonth).keys()];
+            const daysOfMonth = new Date(year, nextMonthIndex, 0).getDate();
 
-        const firstDayAttributes = `class="first-day"
+            const startsOn = new Date(year, monthKey, 1).getDay();
+
+            return {
+                monthName,
+                daysOfMonth,
+                startsOn
+            };
+        });
+
+        // console.log(calendar)
+
+        const html = calendar.map(({ daysOfMonth, monthName, startsOn }) => {
+
+            const days = [...Array(daysOfMonth).keys()];
+
+            const firstDayAttributes = `class="first-day"
         style="--first-day-start: ${startsOn}"`;
-        
-        const renderedDays = days.map((day, index) => 
-            `<li ${ index === 0 ? firstDayAttributes : "" }>${day + 1}</li>`).join("");
 
-        const title=`
+            const renderedDays = days.map((day, index) =>
+                `<li ${index === 0 ? firstDayAttributes : ""}>${day + 1}</li>`).join("");
+
+            const title = `
             <h1>${monthName} ${year}</h1>
         `;
 
-        return `
-            <h1>${title}</h1>
-            <ol>
-                ${renderedWeekDays}
-                ${renderedDays}
-            </ol>`;
-    }).join("");
+            return `
+            <div class="month">
+                ${title}
+                <ol>
+                    ${renderedWeekDays}
+                    ${renderedDays}
+                </ol>
+            </div>`;
+        }).join("");
 
-    document.querySelector("div").innerHTML = html;
+        el.innerHTML = html;
     };
 
-    createCalendar({year: 2077, locale: "zh"});
+    createCalendar({ year: 2077, locale: "es" });
 
 </script>
